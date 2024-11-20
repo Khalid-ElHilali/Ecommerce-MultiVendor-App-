@@ -71,20 +71,17 @@ const App = () => {
     setStripeApiKey(data.stripeApikey);
   }
   
-   useEffect(() => {
-    const loadData = async () => {
-      await Promise.all([
-        Store.dispatch(loadUser()),
-        Store.dispatch(loadSeller()),
-        Store.dispatch(getAllProducts()),
-        Store.dispatch(getAllEvents()),
-        getStripeApikey()
-      ]);
-      setLoading(false); // Set loading to false after all data is fetched
-    };
-
-    loadData();
+ useEffect(() => {
+    console.log("useEffect running...");
+    Store.dispatch(loadUser());
+    Store.dispatch(loadSeller());
+    Store.dispatch(getAllProducts());
+    Store.dispatch(getAllEvents());
+    getStripeApikey();
+    setLoading(false);
   }, []);
+
+  console.log("loading:", loading);
 
   if (loading) {
     return <Loader />; // Show loader component while loading
