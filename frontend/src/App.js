@@ -70,13 +70,20 @@ const App = () => {
     const { data } = await axios.get(`${server}/payment/stripeapikey`);
     setStripeApiKey(data.stripeApikey);
   }
-  useEffect(() => {
-    Store.dispatch(loadUser());
-    Store.dispatch(loadSeller());
-    Store.dispatch(getAllProducts());
-    Store.dispatch(getAllEvents());
-    getStripeApikey();
-    setLoading(false);
+  
+   useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([
+        Store.dispatch(loadUser()),
+        Store.dispatch(loadSeller()),
+        Store.dispatch(getAllProducts()),
+        Store.dispatch(getAllEvents()),
+        getStripeApikey()
+      ]);
+      setLoading(false); // Set loading to false after all data is fetched
+    };
+
+    loadData();
   }, []);
 
   if (loading) {
