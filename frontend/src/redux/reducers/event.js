@@ -1,6 +1,7 @@
 import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
+  allEvents: [],
   isLoading: true,
 };
 
