@@ -17,17 +17,13 @@ const Events = () => {
 
       <div className="w-full grid">
          {
-          allEvents.length > 0 && (
-            <EventCard data={allEvents && allEvents[0]} />
-          )
-         }
-         <h4>{
-           allEvents?.length === 0 && (
-            'No Events have!'
-           )
-          }
-
-         </h4>
+    // First check if allEvents is an array and if it has length > 0
+    Array.isArray(allEvents) && allEvents.length > 0 ? (
+      <EventCard data={allEvents[0]} />
+    ) : (
+      <h4>No Events have!</h4>
+    )
+  }
       </div>
      
     </div>
