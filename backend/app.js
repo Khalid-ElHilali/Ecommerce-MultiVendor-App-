@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 app.use(cors({
-  origin: 'https://shop-click-h8xhcn8q7-nightmarejxs-projects.vercel.app/',
+  origin: 'https://shop-click-app.vercel.app/',
   credentials: true
 }));
 
