@@ -51,8 +51,8 @@ The socket server will handle real-time messaging services. 💬
 ---
 
 ## 📌 Future Updates
-- **Admin Dashboard:** A dedicated space for admins to monitor and manage the platform efficiently.
-- **Bug Fixes:** Resolve non-functional buttons to ensure smooth navigation and interactions.
+- **Notification feature:** prompt timely actions and enhance the user experience with flash sales, abandoned cart reminders, product recommendations, and much more.
+- **Update Admin dashboard:** More features for the admin dashboard coming soon.
 
 ---
 
