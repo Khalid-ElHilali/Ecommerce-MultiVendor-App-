@@ -11,53 +11,55 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const sendShopToken = require("../utils/shopToken");
 
 // create shop
-router.post("/create-shop", catchAsyncErrors(async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    const sellerEmail = await Shop.findOne({ email });
-    if (sellerEmail) {
-      return next(new ErrorHandler("User already exists", 400));
-    }
-
-    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-      folder: "avatars",
-    });
-
-
-    const seller = {
-      name: req.body.name,
-      email: email,
-      password: req.body.password,
-      avatar: {
-        public_id: myCloud.public_id,
-        url: myCloud.secure_url,
-      },
-      address: req.body.address,
-      phoneNumber: req.body.phoneNumber,
-      zipCode: req.body.zipCode,
-    };
-
-    const activationToken = createActivationToken(seller);
-
-    const activationUrl = `https://shop-click-app.vercel.app/seller/activation/${activationToken}`;
-
+router.post(
+  "/create-shop",
+  catchAsyncErrors(async (req, res, next) => {
     try {
-      await sendMail({
-        email: seller.email,
-        subject: "Activate your Shop",
-        message: `Hello ${seller.name}, please click on the link to activate your shop: ${activationUrl}`,
+      const { email } = req.body;
+      const sellerEmail = await Shop.findOne({ email });
+      if (sellerEmail) {
+        return next(new ErrorHandler("User already exists", 400));
+      }
+
+      const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        folder: "avatars",
       });
-      res.status(201).json({
-        success: true,
-        message: `please check your email:- ${seller.email} to activate your shop!`,
-      });
+
+      const seller = {
+        name: req.body.name,
+        email: email,
+        password: req.body.password,
+        avatar: {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        },
+        address: req.body.address,
+        phoneNumber: req.body.phoneNumber,
+        zipCode: req.body.zipCode,
+      };
+
+      const activationToken = createActivationToken(seller);
+
+      const activationUrl = `https://shop-click-app.vercel.app/seller/activation/${activationToken}`;
+
+      try {
+        await sendMail({
+          email: seller.email,
+          subject: "Activate your Shop",
+          message: `Hello ${seller.name}, please click on the link to activate your shop: ${activationUrl}`,
+        });
+        res.status(201).json({
+          success: true,
+          message: `please check your email:- ${seller.email} to activate your shop!`,
+        });
+      } catch (error) {
+        return next(new ErrorHandler(error.message, 500));
+      }
     } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+      return next(new ErrorHandler(error.message, 400));
     }
-  } catch (error) {
-    return next(new ErrorHandler(error.message, 400));
-  }
-}));
+  })
+);
 
 // create activation token
 const createActivationToken = (seller) => {
@@ -193,6 +195,98 @@ router.get(
         shop,
       });
     } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// forget password
+
+router.post(
+  "/forget-password",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      const shop = await Shop.findOne({ email: email });
+
+      if (!shop) {
+        return res.status(404).json({ message: "Store not found" });
+      }
+
+      const token = jwt.sign({ id: shop._id }, process.env.JWT_SECRET_KEY, {
+        expiresIn: "15min",
+      });
+
+      shop.resetPasswordToken = token;
+      shop.resetPasswordTime = Date.now() + 900000; // 15 min expires
+      await shop.save();
+
+      // email link
+      const resetLink = `http://localhost:3000/store/reset-password/${token}`;
+
+      try {
+
+        await sendMail({
+          email: shop.email,
+          subject: "Password reset request",
+          message: `reset password link :  ${resetLink}`,
+        });
+
+        console.log("Email sent successfully!"); // Log success
+
+        return res
+          .status(200)
+          .json({ success: true, message: "Please Check your mailboxx " });
+      } catch (error) {
+        console.error("Error sending email:", error); // Log any email sending error
+        return next(new ErrorHandler(error.message, 500));
+      }
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
+);
+
+// RESET PASSWORD
+
+router.post(
+  "/reset-password",
+  catchAsyncErrors(async (req, res, next) => {
+    const { token, password } = req.body;
+
+    try {
+      console.log("Before jwt.verify");
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      console.log("After jwt.verify");
+
+      console.log("Before Shop.findOne");
+      const shop = await Shop.findOne({
+        _id: decoded.id,
+        resetPasswordToken: token,
+      });
+      console.log("After Shop.findOne");
+
+
+      if (!shop) {
+        return next(new ErrorHandler("Shop not found", 404));
+      }
+      
+      if (Date.now() > shop.resetPasswordTime) {
+        return next(new ErrorHandler("Token is expired", 404));
+      }
+      
+
+      shop.password = password;
+      shop.resetPasswordToken = null;
+      shop.resetPasswordTime = null;
+      await shop.save();
+
+      return res.json({
+        success: true,
+        message: "Password successfully reset!",
+      });
+    } catch (error) {
+      // Ensure no response is sent before calling next()
       return next(new ErrorHandler(error.message, 500));
     }
   })

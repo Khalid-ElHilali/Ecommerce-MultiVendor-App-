@@ -21,6 +21,7 @@ import {
   OrderDetailsPage,
   TrackOrderPage,
   UserInbox,
+  ResetPasswordPage,
 } from "./routes/Routes.js";
 import {
   ShopDashboardPage,
@@ -44,7 +45,7 @@ import {
   AdminDashboardOrders,
   AdminDashboardProducts,
   AdminDashboardEvents,
-  AdminDashboardWithdraw
+  AdminDashboardWithdraw,
 } from "./routes/AdminRoutes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -61,19 +62,20 @@ import { server } from "./server";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import Loader from "./components/Layout/Loader.jsx";
+import ForgetPasswordPage from "./pages/ForgetPasswordPage.jsx";
 
 const App = () => {
   const [stripeApikey, setStripeApiKey] = useState("");
   const [loading, setLoading] = useState(true);
 
-  console.log(server)
-  
+  console.log(server);
+
   async function getStripeApikey() {
     const { data } = await axios.get(`${server}/payment/stripeapikey`);
     setStripeApiKey(data.stripeApikey);
   }
-  
- useEffect(() => {
+
+  useEffect(() => {
     console.log("useEffect running...");
     Store.dispatch(loadUser());
     Store.dispatch(loadSeller());
@@ -86,7 +88,7 @@ const App = () => {
   console.log("loading:", loading);
 
   if (loading) {
-    return <Loader />; // Show loader component while loading
+    return (<Loader />); // Show loader component while loading
   }
 
   return (
@@ -109,10 +111,12 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgetPasswordPage />} />
         <Route
           path="/activation/:activation_token"
           element={<ActivationPage />}
         />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route
           path="/seller/activation/:activation_token"
           element={<SellerActivationPage />}
@@ -167,6 +171,11 @@ const App = () => {
         {/* shop Routes */}
         <Route path="/shop-create" element={<ShopCreatePage />} />
         <Route path="/shop-login" element={<ShopLoginPage />} />
+        <Route path="/store/forget-password" element={<ForgetPasswordPage />} />
+        <Route
+          path="/store/reset-password/:token"
+          element={<ResetPasswordPage />}
+        />
         <Route
           path="/shop/:id"
           element={
@@ -305,7 +314,7 @@ const App = () => {
             </ProtectedAdminRoute>
           }
         />
-         <Route
+        <Route
           path="/admin-products"
           element={
             <ProtectedAdminRoute>
@@ -313,7 +322,7 @@ const App = () => {
             </ProtectedAdminRoute>
           }
         />
-         <Route
+        <Route
           path="/admin-events"
           element={
             <ProtectedAdminRoute>
@@ -321,7 +330,7 @@ const App = () => {
             </ProtectedAdminRoute>
           }
         />
-         <Route
+        <Route
           path="/admin-withdraw-request"
           element={
             <ProtectedAdminRoute>

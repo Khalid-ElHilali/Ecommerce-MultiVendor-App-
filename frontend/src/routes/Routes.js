@@ -17,11 +17,15 @@ import ShopLoginPage from "../pages/ShopLoginPage";
 import OrderDetailsPage from "../pages/OrderDetailsPage";
 import TrackOrderPage from "../pages/TrackOrderPage";
 import UserInbox from "../pages/UserInbox.jsx";
+import ForgetPasswordPage from "../pages/ForgetPasswordPage.jsx"
+import ResetPasswordPage from "../pages/ResetPasswordPage.jsx"
 
 export { 
     LoginPage,
     SignupPage,
     ActivationPage,
+    ForgetPasswordPage,
+    ResetPasswordPage,
     HomePage,
     ProductsPage,
     BestSellingPage,

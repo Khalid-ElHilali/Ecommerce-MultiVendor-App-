@@ -1,6 +1,11 @@
 const ErrorHandler = require("../utils/ErrorHandler");
 
 module.exports = (err, req, res, next) => {
+  // Check if response has already been sent
+  if (res.headersSent) {
+    return next(err); // Let Express handle it
+  }
+
   err.statusCode = err.statusCode || 500;
   err.message = err.message || "Internal server Error";
 
@@ -18,16 +23,17 @@ module.exports = (err, req, res, next) => {
 
   // wrong jwt error
   if (err.name === "JsonWebTokenError") {
-    const message = `Your url is invalid please try again letter`;
+    const message = `Your url is invalid please try again later`;
     err = new ErrorHandler(message, 400);
   }
 
   // jwt expired
   if (err.name === "TokenExpiredError") {
-    const message = `Your Url is expired please try again letter!`;
+    const message = `Your Url is expired please try again later!`;
     err = new ErrorHandler(message, 400);
   }
 
+  // Send JSON response only if headers haven't been sent
   res.status(err.statusCode).json({
     success: false,
     message: err.message,

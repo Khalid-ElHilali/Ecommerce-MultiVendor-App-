@@ -5,7 +5,7 @@ import { FiPackage, FiShoppingBag } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { BiMessageSquareDetail } from "react-icons/bi";
-import Logos from '../../../Assests/img/exportimg'
+import { BigLogo } from '../../../Assests/img/exportimg'
 
 const DashboardHeader = () => {
   const { seller } = useSelector((state) => state.seller);
@@ -14,7 +14,7 @@ const DashboardHeader = () => {
       <div>
         <Link to="/">
           <img
-            src={Logos.BigLogo}
+            src={BigLogo}
             alt=""
             width={'200px'}
           />

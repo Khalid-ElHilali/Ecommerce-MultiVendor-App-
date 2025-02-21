@@ -11,9 +11,13 @@ import {
   footerProductLinks,
   footerSupportLinks,
 } from "../../static/data";
-import Logos from '../../Assests/img/exportimg'
+import {BigLogo} from '../../Assests/img/exportimg'
+
 
 const Footer = () => {
+
+
+
   return (
     <div className="bg-[#000] text-white">
       <div className="md:flex md:justify-between md:items-center sm:px-12 px-4 bg-[#342ac8] py-7">
@@ -38,7 +42,7 @@ const Footer = () => {
       <div className="grid grid-cols-1 sm:gird-cols-3 lg:grid-cols-4 gap-6 sm:px-8 px-5 py-16 sm:text-center">
         <ul className="px-5 text-center sm:text-start flex sm:block flex-col items-center">
           <img
-            src={Logos.BigLogo}
+            src={BigLogo}
             alt=""
             width={'180px'}
             style={{ filter: "brightness(0) invert(1)" }}

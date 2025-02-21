@@ -346,6 +346,82 @@ router.put(
   })
 );
 
+// forget password
+
+router.post(
+  "/forget-password",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ email : email});
+
+      if (!user) {
+        res.status(404).json({ message: "User not found" });
+      }
+
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
+        expiresIn: "15min",
+      });
+
+      user.resetPasswordToken = token;
+      user.resetPasswordTime = Date.now() + 900000; // 15 min expires
+      await user.save();
+
+      // email link
+      const resetLink = `http://localhost:3000/reset-password/${token}`;
+
+      try {
+        console.log("Reset link:", resetLink); // Verify reset l
+        console.log("Sending email to:", user.email);
+
+        await sendMail({
+          email: user.email,
+          subject: "Password reset request",
+          message: `reset password link :  ${resetLink}`,
+        });
+
+        console.log("Email sent successfully!"); // Log success
+
+        res
+          .status(200)
+          .json({ success: true, message: "Please Check your mailbox " });
+      } catch (error) {
+        console.error("Error sending email:", error); // Log any email sending error
+        return next(new ErrorHandler(error.message, 500));
+      }
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
+);
+
+// RESET PASSWORD
+
+router.post(
+  "/reset-password",
+  catchAsyncErrors(async (req, res, next) => {
+    const { token, password } = req.body;
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const user = await User.findOne({ _id: decoded.id, resetPasswordToken: token });
+
+      if (!user || user.resetPasswordTime < Date.now()) {
+        res.status(404).json({ message: "Token is exprired" });
+      }
+
+      user.password = password;
+      user.resetPasswordToken = null;
+      user.resetPasswordTime = null;
+      await user.save();
+
+      res.json({ success: true, message: "Password successfully reset!" });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
 // find user infoormation with the userId
 router.get(
   "/user-info/:id",

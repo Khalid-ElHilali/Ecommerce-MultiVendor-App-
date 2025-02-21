@@ -16,7 +16,7 @@ import { useSelector } from "react-redux";
 import Cart from "../cart/Cart";
 import Wishlist from "../Wishlist/Wishlist";
 import { RxCross1 } from "react-icons/rx";
-import Logos from '../../Assests/img/exportimg'
+import {BigLogo , SmallLogo } from '../../Assests/img/exportimg'
 
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
@@ -59,7 +59,7 @@ const Header = ({ activeHeading }) => {
           <div>
             <Link to="/">
               <img
-                src={Logos.BigLogo}
+                src={BigLogo}
                 alt=""
                 width={'200px'}
               />
@@ -219,7 +219,7 @@ const Header = ({ activeHeading }) => {
           <div>
             <Link to="/">
               <img
-                src={Logos.SmallLogo}
+                src={SmallLogo}
                 alt=""
                 width={'100px'}
                 className=" cursor-pointer"
